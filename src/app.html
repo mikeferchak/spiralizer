@@ -1,12 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<meta name="viewport" content="width=device-width" />
-		%sveltekit.head%
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <style>
+      :root {
+        --color-background: rgb(230, 230, 230);
+        --color-primary: rgb(26, 26, 26);
+        --color-secondary: rgb(74, 74, 74);
+        --nav-background: rgba(230, 230, 230, 0.8);
+        --main-content-padding: 2rem;
+        --section-margin: 6rem;
+        --hero-margin: 12rem;
+        --text-xl: 13rem;
+        --text-lg: 4rem;
+        --text-md: 3rem;
+        --text-sm: 1.6rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --color-background: rgb(26, 26, 26);
+          --color-primary: rgb(230, 230, 230);
+          --color-secondary: rgb(187, 187, 187);
+          --nav-background: rgba(26, 26, 26, 0.8);
+        }
+
+        html {
+          color-scheme: dark;
+        }
+      }
+
+      html {
+        font-size: 10px;
+        background: var(--color-background);
+      }
+
+      html,
+      body {
+        padding: 0;
+        margin: 0;
+        font-family: Helvetica Neue, Helvetica, sans-serif;
+      }
+
+      body {
+        text-transform: uppercase;
+        font-weight: bold;
+        line-height: 1;
+        color: var(--color-primary);
+        font-size: var(--text-sm);
+
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+      }
+
+      @media (max-width: 1200px) {
+        :root {
+          --hero-margin: 10rem;
+          --text-xl: 9rem;
+          --text-lg: 4rem;
+          --text-md: 3rem;
+          --text-sm: 1.6rem;
+        }
+      }
+
+      @media (max-width: 840px) {
+        :root {
+          --hero-margin: 8rem;
+          --section-margin: 4rem;
+          --text-xl: 7rem;
+          --text-lg: 3rem;
+          --text-md: 2.7rem;
+          --text-sm: 1.6rem;
+        }
+      }
+
+      @media (max-width: 560px) {
+        :root {
+          --hero-margin: 6rem;
+          --main-content-padding: 1rem;
+          --section-margin: 3rem;
+          --text-xl: 5rem;
+          --text-lg: 2.5rem;
+          --text-md: 2.5rem;
+          --text-sm: 1.2rem;
+        }
+      }
+    </style>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
 </html>
