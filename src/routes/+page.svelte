@@ -1,180 +1,228 @@
 <script lang="ts">
-  // +y is forward
+  import SvgPreview from "../components/SvgPreview.svelte";
+  import { MAX_SPEED, VIEWPORT_SIZE } from "../config/Config";
+  import {
+    getVectorAngle,
+    getVectorMagnitude,
+    mphToMps,
+    mpsToMph,
+  } from "../utils/utils";
 
-  type Vector = {
-    x: number;
-    y: number;
-  };
+  $: startSpeed = 10; //mph
+  $: endSpeed = mpsToMph(MAX_SPEED); //mph
 
-  type PathPoint = {
-    position: Vector; // m
-    velocity: Vector; // m/s
-    time: number; // s
-    step: number;
-  };
+  $: longitudinalAccelerationGs = 0.3; //g
+  $: longitudinalDecelerationGs = 0.4; //g
+  $: lateralGs = 1.3; //g
 
-  type Path = PathPoint[];
+  $: pathWidth = 5.8; // ft
 
-  function mphToMps(mph: number): number {
-    return mph * 0.44704;
-  }
-
-  function mpsToMph(mps: number): number {
-    return mps / 0.44704;
-  }
-
-  function getVectorMagnitude(vector: Vector): number {
-    return Math.sqrt(vector.x ** 2 + vector.y ** 2); // m/s
-  }
-
-  function getVectorAngle(vector: Vector) {
-    // -PI/2 because we want 0 to be straight up
-    return Math.atan2(vector.y, vector.x) - Math.PI / 2;
-  }
-
-  function rotateVector(vector: Vector, rads: number): Vector {
-    var cos = Math.cos(rads);
-    var sin = Math.sin(rads);
-    const { x: vx, y: vy } = vector;
-    return {
-      x: vx * cos - vy * sin,
-      y: vx * sin + vy * cos,
-    };
-  }
-
-  const VIEWPORT_SIZE: Vector = { x: 120, y: 120 };
-  const PATH_START: Vector = { x: 0, y: 0 };
-
-  const ACCEL_G: Vector = { x: -1.2, y: 0.3 };
-  const G_TO_MS2 = 9.80665;
-  const G_TO_FTS2 = 32.174;
-  const ACCEL_MS2: Vector = { x: ACCEL_G.x * 9.80665, y: ACCEL_G.y * 9.80665 };
-  const START_VELOCITY: Vector = { x: 0, y: mphToMps(10) }; // m/s
-
-  const MAX_SPEED = mphToMps(60);
-
-  const SECONDS: number = 10;
-  const STEPS_PER_SECOND: number = 8;
-
-  let path: Path = [
-    {
-      position: PATH_START,
-      velocity: START_VELOCITY,
-      step: 0,
-      time: 0,
-    },
-  ];
-  let velocity = START_VELOCITY;
-  let position = PATH_START;
-  let step = 0;
-  let speed = getVectorMagnitude(velocity);
-  while (step < SECONDS * STEPS_PER_SECOND && speed < MAX_SPEED) {
-    const angle = getVectorAngle(velocity);
-    const accelerationPerStep = {
-      x: ACCEL_MS2.x / STEPS_PER_SECOND,
-      y: ACCEL_MS2.y / STEPS_PER_SECOND,
-    };
-    const { x: ax, y: ay } = rotateVector(accelerationPerStep, angle);
-    velocity = {
-      x: velocity.x + ax,
-      y: velocity.y + ay,
-    };
-    position = {
-      x: position.x + velocity.x / STEPS_PER_SECOND,
-      y: position.y + velocity.y / STEPS_PER_SECOND,
-    };
-    speed = getVectorMagnitude(velocity);
-
-    const pathPoint: PathPoint = {
-      position,
-      velocity,
-      step,
-      time: step / STEPS_PER_SECOND,
-    };
-
-    path.push(pathPoint);
-    step++;
-  }
+  $: isAccelerating = startSpeed < endSpeed;
 </script>
 
 <main>
-  <h1>Spiralizer</h1>
+  <header>
+    <h1>Spiralizer</h1>
+  </header>
 
-  <h2>Start speed: {mpsToMph(getVectorMagnitude(START_VELOCITY))} mph</h2>
-  <h2>End speed: {mpsToMph(MAX_SPEED)} mph</h2>
-  <h2>Acceleration: {-ACCEL_G.x}g lat, {ACCEL_G.y}g lon</h2>
-  <h2>Image size: {VIEWPORT_SIZE.x}x{VIEWPORT_SIZE.y}pt, 1pt == 1m</h2>
-  <h2 />
+  <div class="content">
+    <div class="controls">
+      <div class="form-input">
+        <div class="label">Start speed</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={startSpeed}
+            min={0}
+            max={mpsToMph(MAX_SPEED)}
+          />
+          <input type="number" bind:value={startSpeed} min={0} />
+          <div class="unit">mph</div>
+        </div>
+      </div>
 
-  <svg
-    width="100"
-    height="100"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox={`-${VIEWPORT_SIZE.x / 2} -${VIEWPORT_SIZE.y / 2} ${
-      VIEWPORT_SIZE.x
-    } ${VIEWPORT_SIZE.y}`}
-  >
-    <path
-      fill="none"
-      stroke="grey"
-      stroke-width="1.8"
-      d={`M ${path[0].position.x} ${path[0].position.y} ${path
-        .slice(1)
-        .map((p) => `L ${p.position.x} ${p.position.y}`)
-        .join(" ")})}`}
-    />
-    {#each path as point}
-      {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 5 === 0}
-        {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 10 === 0}
-          <g>
-            <circle
-              cx={point.position.x}
-              cy={point.position.y}
-              r="0.5"
-              fill="black"
-            />
-            <text
-              x={point.position.x + 1}
-              y={point.position.y - 1}
-              font-size="3"
-              >{Math.round(mpsToMph(getVectorMagnitude(point.velocity)))}</text
-            >
-          </g>
-        {:else}
-          <g>
-            <circle
-              cx={point.position.x}
-              cy={point.position.y}
-              r="0.5"
-              fill="rgb(100, 100, 100)"
-            />
-          </g>
-        {/if}
-      {/if}
-    {/each}
-  </svg>
+      <div class="form-input">
+        <div class="label">end speed</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={endSpeed}
+            min={0}
+            max={mpsToMph(MAX_SPEED)}
+          />
+          <input type="number" bind:value={endSpeed} min={0} />
+          <div class="unit">mph</div>
+        </div>
+      </div>
+
+      <div class="form-input">
+        <div class="label">lateral gs</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={lateralGs}
+            min={-2}
+            max={2}
+            step={0.1}
+          />
+          <input type="number" bind:value={lateralGs} step={0.1} />
+          <div class="unit">gs</div>
+        </div>
+      </div>
+
+      <div class={`form-input ${!isAccelerating && "disabled"}`}>
+        <div class="label" title="don't be pedantic">acceleration gs</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={longitudinalAccelerationGs}
+            min={0}
+            max={2}
+            step={0.1}
+          />
+          <input
+            type="number"
+            bind:value={longitudinalAccelerationGs}
+            min={0}
+            step={0.1}
+          />
+          <div class="unit">gs</div>
+        </div>
+      </div>
+
+      <div class={`form-input ${isAccelerating && "disabled"}`}>
+        <div class="label" title="don't be pedantic">deceleration gs</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={longitudinalDecelerationGs}
+            min={0}
+            max={2}
+            step={0.1}
+          />
+          <input
+            type="number"
+            bind:value={longitudinalDecelerationGs}
+            min={0}
+            step={0.1}
+          />
+          <div class="unit">gs</div>
+        </div>
+      </div>
+
+      <div class="form-input">
+        <div class="label">path width</div>
+        <div class="input">
+          <input
+            type="range"
+            bind:value={pathWidth}
+            min={0}
+            max={25}
+            step={0.1}
+          />
+          <input type="number" bind:value={pathWidth} min={0} step={0.1} />
+          <div class="unit">ft</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview">
+      <SvgPreview
+        {startSpeed}
+        {endSpeed}
+        {longitudinalAccelerationGs}
+        {longitudinalDecelerationGs}
+        {lateralGs}
+        {pathWidth}
+      />
+    </div>
+  </div>
 </main>
 
 <style lang="scss">
   main {
-    padding: var(--main-content-padding);
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+
+    width: 100vw;
+    max-width: 100vw;
+    flex: 1 1 auto;
+
+    header {
+      padding: var(--main-content-padding);
+    }
+
+    .content {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: row;
+      overflow: hidden;
+      flex-wrap: wrap;
+    }
+
+    .controls {
+      padding: var(--main-content-padding);
+      display: flex;
+      flex: 1 0 30rem;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding-right: var(--main-content-padding);
+    }
+
+    .preview {
+      padding: var(--main-content-padding);
+      flex: 1 0 30rem;
+    }
+
+    .form-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .label {
+        font-size: var(--text-sm);
+        padding-right: var(--main-content-padding);
+        min-width: 20rem;
+        flex: 0 0 20rem;
+      }
+      .input {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: var(--text-sm);
+      }
+      .unit {
+        min-width: 4rem;
+        text-align: right;
+        margin-left: 1rem;
+      }
+
+      &.disabled {
+        opacity: 0.25;
+      }
+    }
+
+    input[type="number"] {
+      display: block;
+      font-size: var(--text-sm);
+      font-weight: bold;
+      width: 8rem;
+      background: rgba(255, 255, 255, 0.5);
+      border: none;
+    }
+
+    input[type="range"] {
+      // width: 10rem;
+      flex: 1 1 auto;
+      margin-right: 1rem;
+    }
   }
 
   h1 {
     font-size: var(--text-lg);
-  }
-
-  h2 {
-    margin: 0.5rem 0;
-  }
-
-  svg {
-    display: block;
-    flex: 0 0 auto;
-    height: 400px;
-    width: 400px;
-    border: 1px solid black;
   }
 </style>
