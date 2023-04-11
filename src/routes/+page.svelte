@@ -237,7 +237,7 @@
     flex-direction: row;
     overflow-x: hidden;
     flex-wrap: wrap;
-    width: 100vw;
+    width: 100%;
     max-width: 100vw;
     flex: 1 1 auto;
     padding-bottom: 10rem;
