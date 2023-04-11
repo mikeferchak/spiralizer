@@ -86,7 +86,11 @@
 <main>
   <div class="controls">
     <header>
-      <h1 title="parking lot zoodles">Spiralizer</h1>
+      <h1 title="parking lot zoodles">
+        {startSpeed === 69 || endSpeed === 69 || pathWidth === 69
+          ? "NICE"
+          : "Spiralizer"}
+      </h1>
     </header>
     <div class="form-input">
       <div class="label">Start speed</div>
@@ -117,7 +121,7 @@
     </div>
 
     <div class="form-input">
-      <div class="label">lateral gs</div>
+      <div class="label">{lateralGs === 4.2 ? "high " : ""}lateral gs</div>
       <div class="input">
         <input
           type="range"
@@ -133,7 +137,7 @@
 
     <div class={`form-input ${!isAccelerating && "disabled"}`}>
       <div class="label" title="yeah dude i know. don't be pedantic">
-        acceleration gs
+        {longitudinalAccelerationGs === 4.2 ? "high " : ""}acceleration gs
       </div>
       <div class="input">
         <input
@@ -155,7 +159,7 @@
 
     <div class={`form-input ${isAccelerating && "disabled"}`}>
       <div class="label" title="yeah dude i know. don't be pedantic">
-        deceleration gs
+        {longitudinalDecelerationGs === 4.2 ? "high " : ""}deceleration gs
       </div>
       <div class="input">
         <input
