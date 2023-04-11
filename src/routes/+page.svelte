@@ -73,6 +73,13 @@
   }.svg`;
 </script>
 
+<svelte:head>
+  <title>spiralizer</title>
+  <meta property="og:title" content="spiralizer" />
+  <meta name="description" content="parking lot zoodles" />
+  <meta name="og:description" content="parking lot zoodles" />
+</svelte:head>
+
 <main>
   <div class="controls">
     <header>
