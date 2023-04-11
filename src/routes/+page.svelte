@@ -215,6 +215,12 @@
         Download: {svgName}
       </span>
     </div>
+    <div class="donate">
+      <a
+        href="https://www.buymeacoffee.com/computer.racing"
+        title="twenty dollars can buy many peanuts">$$ DONATE $$</a
+      >
+    </div>
   </footer>
 </main>
 
@@ -305,13 +311,32 @@
       }
     }
 
+    .donate > a {
+      font-size: var(--text-md);
+      color: var(--color-background);
+      text-decoration: none;
+      flex: 1 0 10rem;
+      min-width: 10rem;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
     footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: var(--main-content-padding);
+      padding: 0 var(--main-content-padding);
       background-color: var(--color-primary);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      > div {
+        margin: 2rem 0;
+      }
     }
 
     input[type="number"] {
