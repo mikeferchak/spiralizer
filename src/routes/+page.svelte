@@ -2,8 +2,10 @@
   import SvgPreview from "../components/SvgPreview.svelte";
   import { MAX_SPEED, VIEWPORT_SIZE } from "../config/Config";
   import {
+    feetToMiles,
     getVectorAngle,
     getVectorMagnitude,
+    metersToFeet,
     mphToMps,
     mpsToMph,
   } from "../utils/utils";
@@ -72,134 +74,135 @@
 </script>
 
 <main>
-  <header>
-    <h1>Spiralizer</h1>
-  </header>
-
-  <div class="content">
-    <div class="controls">
-      <div class="form-input">
-        <div class="label">Start speed</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={startSpeed}
-            min={0}
-            max={mpsToMph(MAX_SPEED)}
-          />
-          <input type="number" bind:value={startSpeed} min={0} />
-          <div class="unit">mph</div>
-        </div>
-      </div>
-
-      <div class="form-input">
-        <div class="label">end speed</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={endSpeed}
-            min={0}
-            max={mpsToMph(MAX_SPEED)}
-          />
-          <input type="number" bind:value={endSpeed} min={0} />
-          <div class="unit">mph</div>
-        </div>
-      </div>
-
-      <div class="form-input">
-        <div class="label">lateral gs</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={lateralGs}
-            min={-2}
-            max={2}
-            step={0.1}
-          />
-          <input type="number" bind:value={lateralGs} step={0.1} />
-          <div class="unit">gs</div>
-        </div>
-      </div>
-
-      <div class={`form-input ${!isAccelerating && "disabled"}`}>
-        <div class="label" title="don't be pedantic">acceleration gs</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={longitudinalAccelerationGs}
-            min={0}
-            max={2}
-            step={0.1}
-          />
-          <input
-            type="number"
-            bind:value={longitudinalAccelerationGs}
-            min={0}
-            step={0.1}
-          />
-          <div class="unit">gs</div>
-        </div>
-      </div>
-
-      <div class={`form-input ${isAccelerating && "disabled"}`}>
-        <div class="label" title="don't be pedantic">deceleration gs</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={longitudinalDecelerationGs}
-            min={0}
-            max={2}
-            step={0.1}
-          />
-          <input
-            type="number"
-            bind:value={longitudinalDecelerationGs}
-            min={0}
-            step={0.1}
-          />
-          <div class="unit">gs</div>
-        </div>
-      </div>
-
-      <div class="form-input">
-        <div class="label">path width</div>
-        <div class="input">
-          <input
-            type="range"
-            bind:value={pathWidth}
-            min={0}
-            max={25}
-            step={0.1}
-          />
-          <input type="number" bind:value={pathWidth} min={0} step={0.1} />
-          <div class="unit">ft</div>
-        </div>
-      </div>
-
-      <div class="form-input checkbox-group">
-        <label><input type="checkbox" bind:checked={showLabels} />Labels</label>
-        <label
-          ><input type="checkbox" bind:checked={showMajorTicks} />Major ticks</label
-        >
-        <label
-          ><input type="checkbox" bind:checked={showMinorTicks} />Minor ticks</label
-        >
+  <div class="controls">
+    <header>
+      <h1 title="parking lot zoodles">Spiralizer</h1>
+    </header>
+    <div class="form-input">
+      <div class="label">Start speed</div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={startSpeed}
+          min={0}
+          max={mpsToMph(MAX_SPEED)}
+        />
+        <input type="number" bind:value={startSpeed} min={0} />
+        <div class="unit">mph</div>
       </div>
     </div>
 
-    <div class="preview">
-      <SvgPreview
-        {startSpeed}
-        {endSpeed}
-        {longitudinalAccelerationGs}
-        {longitudinalDecelerationGs}
-        {lateralGs}
-        {pathWidth}
-        {showLabels}
-        {showMajorTicks}
-        {showMinorTicks}
-      />
+    <div class="form-input">
+      <div class="label">end speed</div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={endSpeed}
+          min={0}
+          max={mpsToMph(MAX_SPEED)}
+        />
+        <input type="number" bind:value={endSpeed} min={0} />
+        <div class="unit">mph</div>
+      </div>
     </div>
+
+    <div class="form-input">
+      <div class="label">lateral gs</div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={lateralGs}
+          min={-2}
+          max={2}
+          step={0.1}
+        />
+        <input type="number" bind:value={lateralGs} step={0.1} />
+        <div class="unit">gs</div>
+      </div>
+    </div>
+
+    <div class={`form-input ${!isAccelerating && "disabled"}`}>
+      <div class="label" title="yeah dude i know. don't be pedantic">
+        acceleration gs
+      </div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={longitudinalAccelerationGs}
+          min={0}
+          max={2}
+          step={0.1}
+        />
+        <input
+          type="number"
+          bind:value={longitudinalAccelerationGs}
+          min={0}
+          step={0.1}
+        />
+        <div class="unit">gs</div>
+      </div>
+    </div>
+
+    <div class={`form-input ${isAccelerating && "disabled"}`}>
+      <div class="label" title="yeah dude i know. don't be pedantic">
+        deceleration gs
+      </div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={longitudinalDecelerationGs}
+          min={0}
+          max={2}
+          step={0.1}
+        />
+        <input
+          type="number"
+          bind:value={longitudinalDecelerationGs}
+          min={0}
+          step={0.1}
+        />
+        <div class="unit">gs</div>
+      </div>
+    </div>
+
+    <div class="form-input">
+      <div class="label">path width</div>
+      <div class="input">
+        <input
+          type="range"
+          bind:value={pathWidth}
+          min={0}
+          max={25}
+          step={0.1}
+        />
+        <input type="number" bind:value={pathWidth} min={0} step={0.1} />
+        <div class="unit">ft</div>
+      </div>
+    </div>
+
+    <div class="form-input checkbox-group">
+      <label><input type="checkbox" bind:checked={showLabels} />Labels</label>
+      <label
+        ><input type="checkbox" bind:checked={showMajorTicks} />Major ticks</label
+      >
+      <label
+        ><input type="checkbox" bind:checked={showMinorTicks} />Minor ticks</label
+      >
+    </div>
+  </div>
+
+  <div class="preview">
+    <SvgPreview
+      {startSpeed}
+      {endSpeed}
+      {longitudinalAccelerationGs}
+      {longitudinalDecelerationGs}
+      {lateralGs}
+      {pathWidth}
+      {showLabels}
+      {showMajorTicks}
+      {showMinorTicks}
+    />
   </div>
 
   <footer>
@@ -208,7 +211,9 @@
       on:keydown={() => downloadSvg(svgName)}
       on:click={() => downloadSvg(svgName)}
     >
-      Download: {svgName}
+      <span>
+        Download: {svgName}
+      </span>
     </div>
   </footer>
 </main>
@@ -216,31 +221,20 @@
 <style lang="scss">
   main {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     overflow-x: hidden;
-
+    flex-wrap: wrap;
     width: 100vw;
     max-width: 100vw;
     flex: 1 1 auto;
-
     padding-bottom: 10rem;
-
-    header {
-      padding: var(--main-content-padding);
-    }
-
-    .content {
-      display: flex;
-      flex: 1 1 auto;
-      flex-direction: row;
-      overflow: hidden;
-      flex-wrap: wrap;
-    }
 
     .controls {
       padding: var(--main-content-padding);
       display: flex;
-      flex: 1 0 30rem;
+      flex: 1 1 30rem;
+      min-width: 22rem;
+      max-width: 32rem;
       flex-direction: column;
       overflow-x: hidden;
       overflow-y: auto;
@@ -249,14 +243,17 @@
 
     .preview {
       padding: var(--main-content-padding);
-      flex: 1 0 30rem;
+      flex: 1 1 40rem;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
     }
 
     .form-input {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
 
       .label {
         font-size: var(--text-sm);
@@ -288,6 +285,7 @@
         display: flex;
         align-items: center;
         cursor: pointer;
+        margin-bottom: 1rem;
       }
 
       input {
@@ -299,6 +297,12 @@
       font-size: var(--text-md);
       cursor: pointer;
       color: var(--color-background);
+      &:hover,
+      &:focus {
+        > span {
+          border-bottom: 2px solid var(--color-background);
+        }
+      }
     }
 
     footer {
@@ -320,7 +324,6 @@
     }
 
     input[type="range"] {
-      // width: 10rem;
       flex: 1 1 auto;
       margin-right: 1rem;
     }
@@ -328,5 +331,6 @@
 
   h1 {
     font-size: var(--text-lg);
+    margin-bottom: var(--section-margin);
   }
 </style>

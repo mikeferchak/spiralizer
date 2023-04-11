@@ -5,6 +5,9 @@
     STEPS_PER_SECOND,
     MAX_SPEED,
     VIEWPORT_SIZE,
+    MAJOR_TICK_INTERVAL,
+    MINOR_TICK_INTERVAL,
+    LABEL_INTERVAL,
   } from "../config/Config";
   import type { Path, PathPoint, Vector } from "../types/Types";
   import {
@@ -33,6 +36,10 @@
   let path: Path = [];
   $: distance = 0;
   let time: number | undefined = undefined;
+
+  let majorTicks: Path = [];
+  let minorTicks: Path = [];
+  let labels: Path = [];
 
   $: {
     distance = 0;
@@ -95,6 +102,42 @@
     }
 
     time = step / STEPS_PER_SECOND;
+
+    majorTicks = [];
+    if (showMajorTicks) {
+      const majorTickSpeeds = new Set<number>();
+      path.forEach((point, i) => {
+        const speed = Math.round(mpsToMph(getVectorMagnitude(point.velocity)));
+        if (speed % MAJOR_TICK_INTERVAL === 0 && !majorTickSpeeds.has(speed)) {
+          majorTicks.push(point);
+          majorTickSpeeds.add(speed);
+        }
+      });
+    }
+
+    minorTicks = [];
+    if (showMinorTicks) {
+      const minorTickSpeeds = new Set<number>();
+      path.forEach((point, i) => {
+        const speed = Math.round(mpsToMph(getVectorMagnitude(point.velocity)));
+        if (speed % MINOR_TICK_INTERVAL === 0 && !minorTickSpeeds.has(speed)) {
+          minorTicks.push(point);
+          minorTickSpeeds.add(speed);
+        }
+      });
+    }
+
+    labels = [];
+    if (showLabels) {
+      const labelSpeeds = new Set<number>();
+      path.forEach((point, i) => {
+        const speed = Math.round(mpsToMph(getVectorMagnitude(point.velocity)));
+        if (speed % LABEL_INTERVAL === 0 && !labelSpeeds.has(speed)) {
+          labels.push(point);
+          labelSpeeds.add(speed);
+        }
+      });
+    }
   }
 </script>
 
@@ -116,54 +159,53 @@
       .map((p) => `L ${p.position.x} ${p.position.y}`)
       .join(" ")})}`}
   />
-  {#each path as point}
-    {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 5 === 0}
-      {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 10 === 0}
-        <g>
-          {#if showMajorTicks}
-            <circle
-              cx={point.position.x}
-              cy={point.position.y}
-              r="0.5"
-              fill="black"
-            />
-          {/if}
-          {#if showLabels}
-            <text
-              x={point.position.x + 1}
-              y={point.position.y - 1}
-              font-size="3"
-              >{Math.round(mpsToMph(getVectorMagnitude(point.velocity)))}</text
-            >
-          {/if}
-        </g>
-      {:else if showMinorTicks}
-        <g>
-          <circle
-            cx={point.position.x}
-            cy={point.position.y}
-            r="0.5"
-            fill="rgb(100, 100, 100)"
-          />
-        </g>
-      {/if}
-    {/if}
+
+  {#each minorTicks as point}
+    <circle
+      cx={point?.position.x}
+      cy={point?.position.y}
+      r="0.5"
+      fill="rgb(100, 100, 100)"
+    />
+  {/each}
+
+  {#each majorTicks as point}
+    <circle cx={point.position.x} cy={point.position.y} r="0.5" fill="black" />
+  {/each}
+
+  {#each labels as point}
+    <text x={point.position.x + 1} y={point.position.y - 1} font-size="3"
+      >{Math.round(mpsToMph(getVectorMagnitude(point.velocity)))}</text
+    >
   {/each}
 </svg>
-<p>Image size: {VIEWPORT_SIZE.x}x{VIEWPORT_SIZE.y}pt, 1pt == 1m</p>
-<p>
-  Path distance: {metersToFeet(distance).toFixed(0)}ft, {distance.toFixed(0)}m, {feetToMiles(
-    metersToFeet(distance)
-  ).toFixed(2)}miles
-</p>
-<p>Duration: {time}s</p>
+<div class="info">
+  <p>Image size: {VIEWPORT_SIZE.x}x{VIEWPORT_SIZE.y}pt, 1pt == 1m</p>
+  <p>
+    Path distance: {metersToFeet(distance).toFixed(0)}ft, {distance.toFixed(
+      0
+    )}m, {feetToMiles(metersToFeet(distance)).toFixed(2)}miles
+  </p>
+  <p>Duration: {time}s</p>
+</div>
 
 <style lang="scss">
   svg {
     width: 100%;
+    max-width: calc(min(70vh, 50vw));
+    min-width: 30rem;
     height: auto;
     aspect-ratio: 1;
+    margin-right: var(--main-content-padding);
+    margin-bottom: var(--main-content-padding);
 
     border: 1px solid var(--color-primary);
+  }
+
+  .info {
+    color: var(--color-secondary);
+    display: flex;
+    flex: 1 0 30rem;
+    flex-direction: column;
   }
 </style>
