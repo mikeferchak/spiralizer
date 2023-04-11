@@ -1,6 +1,6 @@
 <script lang="ts">
   import SvgPreview from "../components/SvgPreview.svelte";
-  import { MAX_SPEED, VIEWPORT_SIZE } from "../config/Config";
+  import { MAX_SPEED, STEPS_PER_SECOND, VIEWPORT_SIZE } from "../config/Config";
   import {
     feetToMiles,
     getVectorAngle,
@@ -51,6 +51,7 @@
 
   $: startSpeed = 10; //mph
   $: endSpeed = mpsToMph(MAX_SPEED); //mph
+  $: stepsPerSecond = STEPS_PER_SECOND;
 
   $: longitudinalAccelerationGs = 0.3; //g
   $: longitudinalDecelerationGs = 0.4; //g
@@ -209,6 +210,7 @@
       {showLabels}
       {showMajorTicks}
       {showMinorTicks}
+      {stepsPerSecond}
     />
   </div>
 

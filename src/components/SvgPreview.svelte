@@ -2,7 +2,6 @@
   import {
     PATH_START,
     SECONDS,
-    STEPS_PER_SECOND,
     MAX_SPEED,
     VIEWPORT_SIZE,
     MAJOR_TICK_INTERVAL,
@@ -28,6 +27,7 @@
   export let longitudinalDecelerationGs: number;
   export let lateralGs: number;
   export let pathWidth: number;
+  export let stepsPerSecond: number;
 
   export let showMajorTicks: boolean;
   export let showMinorTicks: boolean;
@@ -69,14 +69,14 @@
     let step = 0;
     let speed = getVectorMagnitude(velocity);
     while (
-      step < SECONDS * STEPS_PER_SECOND &&
+      step < SECONDS * stepsPerSecond &&
       ((isAccelerating && speed < endSpeedMps) ||
         (!isAccelerating && speed > endSpeedMps))
     ) {
       const angle = getVectorAngle(velocity);
       const accelerationPerStep = {
-        x: accelMs2.x / STEPS_PER_SECOND,
-        y: accelMs2.y / STEPS_PER_SECOND,
+        x: accelMs2.x / stepsPerSecond,
+        y: accelMs2.y / stepsPerSecond,
       };
       const { x: ax, y: ay } = rotateVector(accelerationPerStep, angle);
       velocity = {
@@ -84,8 +84,8 @@
         y: velocity.y + ay,
       };
       position = {
-        x: position.x + velocity.x / STEPS_PER_SECOND,
-        y: position.y - velocity.y / STEPS_PER_SECOND,
+        x: position.x + velocity.x / stepsPerSecond,
+        y: position.y - velocity.y / stepsPerSecond,
       };
       speed = getVectorMagnitude(velocity);
 
@@ -93,15 +93,17 @@
         position,
         velocity,
         step,
-        time: step / STEPS_PER_SECOND,
+        time: step / stepsPerSecond,
       };
 
       path.push(pathPoint);
       step++;
-      distance = distance + speed / STEPS_PER_SECOND;
+      distance = distance + speed / stepsPerSecond;
     }
 
-    time = step / STEPS_PER_SECOND;
+    path = path.filter((p) => p.step % 10 === 0);
+
+    time = step / stepsPerSecond;
 
     majorTicks = [];
     if (showMajorTicks) {

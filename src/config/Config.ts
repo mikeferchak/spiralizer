@@ -11,7 +11,7 @@ export const G_TO_FTS2 = 32.174;
 export const MAX_SPEED = mphToMps(60);
 
 export const SECONDS: number = 60;
-export const STEPS_PER_SECOND: number = 10;
+export const STEPS_PER_SECOND: number = 100;
 
 export const MAJOR_TICK_INTERVAL = 10;
 export const MINOR_TICK_INTERVAL = 5;
