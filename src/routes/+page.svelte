@@ -240,6 +240,7 @@
     width: 100vw;
     max-width: 100vw;
     flex: 1 1 auto;
+    padding: var(--main-content-padding);
     padding-bottom: 10rem;
 
     .controls {
