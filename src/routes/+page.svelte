@@ -63,12 +63,14 @@
 
   $: isAccelerating = startSpeed < endSpeed;
 
-  $: svgName = `${Math.round(startSpeed)}_${Math.round(endSpeed)}__${lateralGs
+  $: svgName = `${Math.round(startSpeed)}_${Math.round(endSpeed)}__${(
+    lateralGs ?? 0
+  )
     .toFixed(1)
     .replaceAll(".", "_")}__${
     isAccelerating
-      ? longitudinalAccelerationGs.toFixed(1).replaceAll(".", "_")
-      : longitudinalDecelerationGs.toFixed(1).replaceAll(".", "_")
+      ? (longitudinalAccelerationGs ?? 0).toFixed(1).replaceAll(".", "_")
+      : (longitudinalDecelerationGs ?? 0).toFixed(1).replaceAll(".", "_")
   }__${isAccelerating ? "accel" : "decel"}${
     lateralGs ? (Math.sign(lateralGs) === 1 ? "__right" : "__left") : ""
   }.svg`;
