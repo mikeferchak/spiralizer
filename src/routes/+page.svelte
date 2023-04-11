@@ -94,10 +94,10 @@
         <input
           type="range"
           bind:value={startSpeed}
-          min={0}
+          min={1}
           max={mpsToMph(MAX_SPEED)}
         />
-        <input type="number" bind:value={startSpeed} min={0} />
+        <input type="number" bind:value={startSpeed} min={1} />
         <div class="unit">mph</div>
       </div>
     </div>
@@ -108,10 +108,10 @@
         <input
           type="range"
           bind:value={endSpeed}
-          min={0}
+          min={1}
           max={mpsToMph(MAX_SPEED)}
         />
-        <input type="number" bind:value={endSpeed} min={0} />
+        <input type="number" bind:value={endSpeed} min={1} />
         <div class="unit">mph</div>
       </div>
     </div>
