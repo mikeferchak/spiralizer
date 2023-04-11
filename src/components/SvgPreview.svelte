@@ -26,6 +26,10 @@
   export let lateralGs: number;
   export let pathWidth: number;
 
+  export let showMajorTicks: boolean;
+  export let showMinorTicks: boolean;
+  export let showLabels: boolean;
+
   let path: Path = [];
   $: distance = 0;
   let time: number | undefined = undefined;
@@ -101,6 +105,7 @@
   viewBox={`-${VIEWPORT_SIZE.x / 2} -${VIEWPORT_SIZE.y / 2} ${
     VIEWPORT_SIZE.x
   } ${VIEWPORT_SIZE.y}`}
+  id="spiralizer"
 >
   <path
     fill="none"
@@ -115,17 +120,24 @@
     {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 5 === 0}
       {#if Math.round(mpsToMph(getVectorMagnitude(point.velocity))) % 10 === 0}
         <g>
-          <circle
-            cx={point.position.x}
-            cy={point.position.y}
-            r="0.5"
-            fill="black"
-          />
-          <text x={point.position.x + 1} y={point.position.y - 1} font-size="3"
-            >{Math.round(mpsToMph(getVectorMagnitude(point.velocity)))}</text
-          >
+          {#if showMajorTicks}
+            <circle
+              cx={point.position.x}
+              cy={point.position.y}
+              r="0.5"
+              fill="black"
+            />
+          {/if}
+          {#if showLabels}
+            <text
+              x={point.position.x + 1}
+              y={point.position.y - 1}
+              font-size="3"
+              >{Math.round(mpsToMph(getVectorMagnitude(point.velocity)))}</text
+            >
+          {/if}
         </g>
-      {:else}
+      {:else if showMinorTicks}
         <g>
           <circle
             cx={point.position.x}

@@ -8,16 +8,67 @@
     mpsToMph,
   } from "../utils/utils";
 
+  function downloadSvg(name: string) {
+    var svg = document.getElementById("spiralizer");
+    var serializer = new XMLSerializer();
+
+    if (!svg) {
+      return;
+    }
+
+    var source = serializer.serializeToString(svg);
+    source = source.replace(/(\w+)?:?xlink=/g, "xmlns:xlink="); // Fix root xlink without namespace
+
+    source = source.replace(/ns\d+:href/g, "xlink:href"); // Safari NS namespace fix.
+
+    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+      source = source.replace(
+        /^<svg/,
+        '<svg xmlns="http://www.w3.org/2000/svg"'
+      );
+    }
+    if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+      source = source.replace(
+        /^<svg/,
+        '<svg xmlns:xlink="http://www.w3.org/1999/xlink"'
+      );
+    }
+
+    var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+    var svgBlob = new Blob([preface, source], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    var svgUrl = URL.createObjectURL(svgBlob);
+    var downloadLink = document.createElement("a");
+    downloadLink.href = svgUrl;
+    downloadLink.download = name;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
   $: startSpeed = 10; //mph
   $: endSpeed = mpsToMph(MAX_SPEED); //mph
 
   $: longitudinalAccelerationGs = 0.3; //g
   $: longitudinalDecelerationGs = 0.4; //g
   $: lateralGs = 1.3; //g
-
   $: pathWidth = 5.8; // ft
+  $: showMajorTicks = true;
+  $: showMinorTicks = true;
+  $: showLabels = true;
 
   $: isAccelerating = startSpeed < endSpeed;
+
+  $: svgName = `${Math.round(startSpeed)}_${Math.round(endSpeed)}__${lateralGs
+    .toFixed(1)
+    .replaceAll(".", "_")}__${
+    isAccelerating
+      ? longitudinalAccelerationGs.toFixed(1).replaceAll(".", "_")
+      : longitudinalDecelerationGs.toFixed(1).replaceAll(".", "_")
+  }__${isAccelerating ? "accel" : "decel"}${
+    lateralGs ? (Math.sign(lateralGs) === 1 ? "__right" : "__left") : ""
+  }.svg`;
 </script>
 
 <main>
@@ -124,6 +175,16 @@
           <div class="unit">ft</div>
         </div>
       </div>
+
+      <div class="form-input checkbox-group">
+        <label><input type="checkbox" bind:checked={showLabels} />Labels</label>
+        <label
+          ><input type="checkbox" bind:checked={showMajorTicks} />Major ticks</label
+        >
+        <label
+          ><input type="checkbox" bind:checked={showMinorTicks} />Minor ticks</label
+        >
+      </div>
     </div>
 
     <div class="preview">
@@ -134,9 +195,22 @@
         {longitudinalDecelerationGs}
         {lateralGs}
         {pathWidth}
+        {showLabels}
+        {showMajorTicks}
+        {showMinorTicks}
       />
     </div>
   </div>
+
+  <footer>
+    <div
+      class="download"
+      on:keydown={() => downloadSvg(svgName)}
+      on:click={() => downloadSvg(svgName)}
+    >
+      Download: {svgName}
+    </div>
+  </footer>
 </main>
 
 <style lang="scss">
@@ -148,6 +222,8 @@
     width: 100vw;
     max-width: 100vw;
     flex: 1 1 auto;
+
+    padding-bottom: 10rem;
 
     header {
       padding: var(--main-content-padding);
@@ -204,6 +280,34 @@
       &.disabled {
         opacity: 0.25;
       }
+    }
+
+    .checkbox-group {
+      justify-content: space-between;
+      label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      input {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .download {
+      font-size: var(--text-md);
+      cursor: pointer;
+      color: var(--color-background);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--main-content-padding);
+      background-color: var(--color-primary);
     }
 
     input[type="number"] {
