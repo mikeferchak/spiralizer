@@ -32,6 +32,7 @@
   export let showMajorTicks: boolean;
   export let showMinorTicks: boolean;
   export let showLabels: boolean;
+  export let coloredPath: boolean;
 
   let path: Path = [];
   $: distance = 0;
@@ -40,12 +41,13 @@
   let majorTicks: Path = [];
   let minorTicks: Path = [];
   let labels: Path = [];
+  let isAccelerating: boolean = false;
 
   $: {
     distance = 0;
     time = 0;
     const startVelocity = { x: 0, y: mphToMps(startSpeed) };
-    const isAccelerating = startSpeed < endSpeed;
+    isAccelerating = startSpeed < endSpeed;
 
     const accelMs2: Vector = {
       x: gsToMps2(lateralGs),
@@ -154,7 +156,11 @@
 >
   <path
     fill="none"
-    stroke="grey"
+    stroke={coloredPath
+      ? isAccelerating
+        ? "rgba(61, 128, 76, 0.5)"
+        : "rgba(131, 62, 62, 0.5)"
+      : "gray"}
     stroke-width={ftToMeter(pathWidth)}
     d={`M ${path[0].position.x} ${path[0].position.y} ${path
       .slice(1)

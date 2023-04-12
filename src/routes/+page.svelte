@@ -60,6 +60,7 @@
   $: showMajorTicks = true;
   $: showMinorTicks = true;
   $: showLabels = true;
+  $: coloredPath = true;
 
   $: isAccelerating = startSpeed < endSpeed;
 
@@ -195,6 +196,9 @@
     </div>
 
     <div class="form-input checkbox-group">
+      <label
+        ><input type="checkbox" bind:checked={coloredPath} />Colored path</label
+      >
       <label><input type="checkbox" bind:checked={showLabels} />Labels</label>
       <label
         ><input type="checkbox" bind:checked={showMajorTicks} />Major ticks</label
@@ -217,6 +221,7 @@
       {showMajorTicks}
       {showMinorTicks}
       {stepsPerSecond}
+      {coloredPath}
     />
   </div>
 
