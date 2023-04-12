@@ -144,8 +144,8 @@
 </script>
 
 <svg
-  width="120"
-  height="120"
+  width={metersToFeet(VIEWPORT_SIZE.x)}
+  height={metersToFeet(VIEWPORT_SIZE.y)}
   xmlns="http://www.w3.org/2000/svg"
   viewBox={`-${VIEWPORT_SIZE.x / 2} -${VIEWPORT_SIZE.y / 2} ${
     VIEWPORT_SIZE.x
@@ -182,7 +182,11 @@
   {/each}
 </svg>
 <div class="info">
-  <p>Image size: {VIEWPORT_SIZE.x}x{VIEWPORT_SIZE.y}pt, 1pt == 1m</p>
+  <p>
+    Image size: {metersToFeet(VIEWPORT_SIZE.x)}x{metersToFeet(
+      VIEWPORT_SIZE.y
+    )}pt, 1pt == 1ft
+  </p>
   <p>
     Path distance: {metersToFeet(distance).toFixed(0)}ft, {distance.toFixed(
       0
